@@ -18,6 +18,7 @@ func _on_download_completed(result, response_code, headers, body):
 		var button = Button.new()
 		button.text = item.title + " (" + str(item.duration_minutes) + " minutes)"
 		button.connect("button_down", self, "_button_clicked", [item])
+		button.add_font_override("font", load("res://DefaultFont.tres"))
 		
 		button.margin_left = 16
 		button.margin_top += 16 + (i * 32)
