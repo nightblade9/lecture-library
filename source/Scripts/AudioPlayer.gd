@@ -8,7 +8,7 @@ const _START_DELAY_SECONDS = 3
 var item:Dictionary # URL, etc.
 
 var thread:Thread # BG thread that buffers data
-var buffer:PoolByteArray # buffered data
+var buffer:PoolByteArray = PoolByteArray() # buffered data
 
 func _ready():
 	thread = Thread.new()
@@ -20,10 +20,24 @@ func _ready():
 	while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
 		OS.delay_msec(100)
 		
+	_copy_and_start()
+	$AudioStreamPlayer.connect("finished", self, "_on_finished")
+
+func _copy_and_start():
+	# GET OLD POSITION if applicable: 
+	# $AudioStreamPlayer.get_playback_position()
 	var ogg_stream = AudioStreamOGGVorbis.new()
-	ogg_stream.data = buffer
+	#ogg_stream.data = buffer
+	var copy = PoolByteArray(buffer)
+	buffer = PoolByteArray()
+	
+	ogg_stream.data = copy
 	$AudioStreamPlayer.stream = ogg_stream
 	$AudioStreamPlayer.play()
+
+func _on_finished():
+	print("??? PB=" + str($AudioStreamPlayer.get_playback_position()))
+	_copy_and_start()
 	
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
@@ -36,9 +50,7 @@ func _start_streaming(params):
 	# Stream the file
 	var http = HTTPClient.new()
 	var error = http.connect_to_host(host, -1, use_ssl)
-	
-	buffer = PoolByteArray()
-	
+		
 	############################################################
 	# http://codetuto.com/2015/05/using-httpclient-in-godot/
 	
@@ -51,9 +63,6 @@ func _start_streaming(params):
 		"Accept: */*"
 	]
 
-	var status = http.get_status()
-	var expected = HTTPClient.STATUS_CONNECTED
-
 	# TODO: do everything below in a background thread as we play
 	error = http.request(HTTPClient.METHOD_GET, url, headers)
 
@@ -65,11 +74,11 @@ func _start_streaming(params):
 		headers = http.get_response_headers_as_dictionary()
 		while(http.get_status() == HTTPClient.STATUS_BODY):
 			http.poll()
-			var chunk = http.read_response_body_chunk()	
+			var chunk = http.read_response_body_chunk()
 			if(chunk.size() == 0):
 				OS.delay_usec(100)
 			else:
 				buffer.append_array(chunk)
-				$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024 / 1024.0) + " mb"
+				$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
 				
 	

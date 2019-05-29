@@ -10,8 +10,8 @@ func _ready():
 	request.request(_INDEX_FILE_URL)
 
 func _on_download_completed(result, response_code, headers, body):
+	$Label.text = ""
 	var json = JSON.parse(body.get_string_from_utf8()).result
-	var text = ""
 	
 	for item in json:
 		var button = Button.new()
