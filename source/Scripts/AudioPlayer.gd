@@ -8,7 +8,6 @@ const _START_DELAY_SECONDS = 3
 var item:Dictionary # URL, etc.
 
 var thread:Thread # BG thread that buffers data
-var _state = "starting" # starting/ready/playing
 var buffer:PoolByteArray # buffered data
 
 func _ready():
@@ -16,11 +15,11 @@ func _ready():
 	thread.start(self, "_start_streaming")
 	
 	###
-	# Wait until we have enough data loaded that we can start.
-	# Also, wait until the array is big enough that we can append/buffer data
-	# and not worry about running out. Well, we may still run out.
+	# Wait until we have enough data loaded that we can start. Otherwise, no audio.
 	###
-	OS.delay_msec(_START_DELAY_SECONDS * 1000)
+	while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
+		OS.delay_msec(100)
+		
 	var ogg_stream = AudioStreamOGGVorbis.new()
 	ogg_stream.data = buffer
 	$AudioStreamPlayer.stream = ogg_stream
