@@ -3,7 +3,6 @@ extends WindowDialog
 # We can't play audio until we streamed enough of the file. This value
 # (how many bytes needed) is experimentally derived.
 const _BYTES_NEEDED_TO_PLAY_FILE = 8192 # 8kb
-const _START_DELAY_SECONDS = 3
 
 var item:Dictionary # URL, etc.
 
@@ -23,21 +22,14 @@ func _ready():
 	_copy_and_start()
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
 
-func _copy_and_start():
-	# GET OLD POSITION if applicable: 
-	# $AudioStreamPlayer.get_playback_position()
+func _copy_and_start(position = 0):
 	var ogg_stream = AudioStreamOGGVorbis.new()
-	#ogg_stream.data = buffer
-	var copy = PoolByteArray(buffer)
-	buffer = PoolByteArray()
-	
-	ogg_stream.data = copy
+	ogg_stream.data = buffer
 	$AudioStreamPlayer.stream = ogg_stream
-	$AudioStreamPlayer.play()
+	$AudioStreamPlayer.play(position)
 
 func _on_finished():
-	print("??? PB=" + str($AudioStreamPlayer.get_playback_position()))
-	_copy_and_start()
+	_copy_and_start($AudioStreamPlayer.get_playback_position())
 	
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
@@ -79,6 +71,6 @@ func _start_streaming(params):
 				OS.delay_usec(100)
 			else:
 				buffer.append_array(chunk)
-				$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
+				#$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
 				
 	
