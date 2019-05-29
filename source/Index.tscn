@@ -10,4 +10,4 @@ margin_left = 8.0
 margin_top = 10.0
 margin_right = 86.0
 margin_bottom = 24.0
-text = "LOADING ..."
+text = "Loading list of audios from server ..."

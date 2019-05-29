@@ -22,13 +22,37 @@ func _ready():
 	_copy_and_start()
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
 
+#func _process(t):
+	#$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
+	#if $AudioStreamPlayer.playing:
+#		print("Playing " + _seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + _seconds_to_time(item.duration_minutes * 60))
+#		print("Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb")
+
+func _seconds_to_time(seconds:float):
+	var int_seconds:int = seconds
+	var minutes = int_seconds / 60
+	var hours = minutes / 60
+	
+	if minutes < 60:
+		return str(minutes) + ":" + str(int_seconds % 60)
+	else:
+		return str(hours) + ":" + str(minutes % 60) + ":" + str(int_seconds % 60)
+
 func _copy_and_start(position = 0):
 	var ogg_stream = AudioStreamOGGVorbis.new()
 	ogg_stream.data = buffer
-	$AudioStreamPlayer.stream = ogg_stream
+	 # crashes here
+	#$AudioStreamPlayer.stream = ogg_stream
+	if $AudioStreamPlayer.stream == null:
+		$AudioStreamPlayer.stream = ogg_stream
+		
+	$AudioStreamPlayer.stream.data = buffer
+	print("@4")
 	$AudioStreamPlayer.play(position)
+	print("@5")
 
 func _on_finished():
+	print("Finished")
 	_copy_and_start($AudioStreamPlayer.get_playback_position())
 	
 func _start_streaming(params):
@@ -71,6 +95,3 @@ func _start_streaming(params):
 				OS.delay_usec(100)
 			else:
 				buffer.append_array(chunk)
-				#$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
-				
-	

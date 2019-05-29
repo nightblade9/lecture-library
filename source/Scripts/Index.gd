@@ -23,4 +23,6 @@ func _button_clicked(item):
 	var player = AudioPlayer.instance()
 	player.item = item
 	add_child(player)
+	player.popup_exclusive = true
 	player.popup_centered()
+	
