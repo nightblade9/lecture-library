@@ -3,42 +3,29 @@ extends WindowDialog
 # We can't play audio until we streamed enough of the file. This value
 # (how many bytes needed) is experimentally derived.
 const _BYTES_NEEDED_TO_PLAY_FILE = 8192 # 8kb
-var item:Dictionary
-var thread:Thread
-var _state = "starting"
-var buffer:PoolByteArray
+const _START_DELAY_SECONDS = 3
+
+var item:Dictionary # URL, etc.
+
+var thread:Thread # BG thread that buffers data
+var _state = "starting" # starting/ready/playing
+var buffer:PoolByteArray # buffered data
 
 func _ready():
 	thread = Thread.new()
 	thread.start(self, "_start_streaming")
-	$AudioStreamPlayer.connect("finished", self, "_on_chunk_done")
 	
-func _on_chunk_done():
-	#call_deferred("_copy_and_play")
-	#_copy_and_play()
+	###
+	# Wait until we have enough data loaded that we can start.
+	# Also, wait until the array is big enough that we can append/buffer data
+	# and not worry about running out. Well, we may still run out.
+	###
+	OS.delay_msec(_START_DELAY_SECONDS * 1000)
 	var ogg_stream = AudioStreamOGGVorbis.new()
-	var buffer_copy = PoolByteArray()
-	buffer_copy.append_array(buffer)
-	ogg_stream.data = buffer_copy
+	ogg_stream.data = buffer
 	$AudioStreamPlayer.stream = ogg_stream
 	$AudioStreamPlayer.play()
 	
-func _copy_and_play():
-	print("!!!!")
-	#var position = $AudioStreamPlayer.get_playback_position()
-	#$AudioStreamPlayer.play(position)
-	var ogg_stream = AudioStreamOGGVorbis.new()
-	var buffer_copy = PoolByteArray()
-	buffer_copy.append_array(buffer)
-	ogg_stream.data = buffer_copy
-	$AudioStreamPlayer.stream = ogg_stream
-	$AudioStreamPlayer.play()
-	
-func _process(t):
-	if _state == "ready":
-		_state = "playing"
-		_copy_and_play()
-
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
 	var stop = item.url.find("/", start)
@@ -84,8 +71,6 @@ func _start_streaming(params):
 				OS.delay_usec(100)
 			else:
 				buffer.append_array(chunk)
-				
 				$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024 / 1024.0) + " mb"
-				if len(buffer) >= _BYTES_NEEDED_TO_PLAY_FILE and _state == "starting":
-					_state = "ready"
+				
 	
