@@ -10,5 +10,12 @@
         "url": "https://ia802803.us.archive.org/18/items/SurahYusuf01Introduction/SurahYusuf01Introduction.ogg",
         "duration_minutes": 51,
         "duration_seconds": 44
+    },
+    {
+        "title": "Surah Baqarah (test)",
+        "url": "https://ia801303.us.archive.org/19/items/AlBaqarah_201509/Al%20Baqarah.ogg",
+        "duration_minutes": 234,
+        "duration_seconds": 59
+        
     }
 ]
