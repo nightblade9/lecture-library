@@ -22,11 +22,11 @@ func _ready():
 	_copy_and_start()
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
 
-#func _process(t):
+func _process(t):
 	#$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
-	#if $AudioStreamPlayer.playing:
-#		print("Playing " + _seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + _seconds_to_time(item.duration_minutes * 60))
-#		print("Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb")
+	if $AudioStreamPlayer.playing:
+		$StatusLabel.text = "Playing " + _seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + _seconds_to_time(item.duration_minutes * 60)
+		$StatusLabel.text += "\nStreamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
 
 func _seconds_to_time(seconds:float):
 	var int_seconds:int = seconds
