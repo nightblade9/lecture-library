@@ -15,3 +15,4 @@ margin_bottom = 136.655
 text = "Play"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[connection signal="pressed" from="PlayButton" to="." method="_on_PlayButton_pressed"]

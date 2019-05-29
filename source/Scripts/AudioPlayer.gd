@@ -18,4 +18,6 @@ func _on_audio_ready(result, response_code, headers, body):
 	var ogg = AudioStreamOGGVorbis.new()
 	ogg.data = body
 	$AudioStreamPlayer.stream = ogg
+
+func _on_PlayButton_pressed():
 	$AudioStreamPlayer.play()
