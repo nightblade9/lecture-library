@@ -1,11 +1,17 @@
 extends WindowDialog
 
 var item:Dictionary
+var thread:Thread
 
 func _ready():
+	thread = Thread.new()
 	$PlayButton.disabled = true
 	$PlayButton.text = "Loading ..."
 	
+	#if not thread.is_active():
+	thread.start(self, "_start_streaming")
+
+func _start_streaming(params):
 	var start = item.url.find("://") + 3
 	var stop = item.url.find("/", start)
 	var host = item.url.substr(start, stop - start)
@@ -50,18 +56,17 @@ func _ready():
 			if(chunk.size() == 0):
 				OS.delay_usec(100)
 			else:
+				rb = rb + chunk
+				
 				# Updated every chunk, meh.
 				$PlayButton.disabled = false
 				$PlayButton.text = "Play"
-				
-				rb = rb + chunk
 				
 				# constantly re-assign
 				ogg_stream.data = rb
 				$AudioStreamPlayer.stream = ogg_stream
 				#call_deferred("_send_loading_signal",rb.size(),http.get_response_body_length())
-	  
-	pass
+	
 	############################################################
 
 func _on_PlayButton_pressed():
