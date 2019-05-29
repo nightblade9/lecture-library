@@ -10,19 +10,34 @@ var buffer:PoolByteArray
 
 func _ready():
 	thread = Thread.new()
-	
-	#if not thread.is_active():
 	thread.start(self, "_start_streaming")
-	#self._start_streaming([])
+	$AudioStreamPlayer.connect("finished", self, "_on_chunk_done")
+	
+func _on_chunk_done():
+	#call_deferred("_copy_and_play")
+	#_copy_and_play()
+	var ogg_stream = AudioStreamOGGVorbis.new()
+	var buffer_copy = PoolByteArray()
+	buffer_copy.append_array(buffer)
+	ogg_stream.data = buffer_copy
+	$AudioStreamPlayer.stream = ogg_stream
+	$AudioStreamPlayer.play()
+	
+func _copy_and_play():
+	print("!!!!")
+	#var position = $AudioStreamPlayer.get_playback_position()
+	#$AudioStreamPlayer.play(position)
+	var ogg_stream = AudioStreamOGGVorbis.new()
+	var buffer_copy = PoolByteArray()
+	buffer_copy.append_array(buffer)
+	ogg_stream.data = buffer_copy
+	$AudioStreamPlayer.stream = ogg_stream
+	$AudioStreamPlayer.play()
 	
 func _process(t):
 	if _state == "ready":
 		_state = "playing"
-		
-		var ogg_stream = AudioStreamOGGVorbis.new()
-		ogg_stream.data = buffer
-		$AudioStreamPlayer.stream = ogg_stream
-		$AudioStreamPlayer.play()
+		_copy_and_play()
 
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
@@ -70,16 +85,7 @@ func _start_streaming(params):
 			else:
 				buffer.append_array(chunk)
 				
-				#ogg_stream.data = buffer
-				#$AudioStreamPlayer.stream = ogg_stream
-				
 				$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024 / 1024.0) + " mb"
 				if len(buffer) >= _BYTES_NEEDED_TO_PLAY_FILE and _state == "starting":
 					_state = "ready"
-					#$AudioStreamPlayer.play()
-					#print("PLAYER")
-					#yield()
-					#yield(get_tree().create_timer(0.1), 'timeout')
-				
-				#call_deferred("_send_loading_signal",rb.size(),http.get_response_body_length())
 	
