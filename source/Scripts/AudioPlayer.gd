@@ -11,8 +11,8 @@ func _ready():
 	thread = Thread.new()
 	
 	#if not thread.is_active():
-	#thread.start(self, "_start_streaming")
-	self._start_streaming([])
+	thread.start(self, "_start_streaming")
+	#self._start_streaming([])
 
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
@@ -70,7 +70,7 @@ func _start_streaming(params):
 					$AudioStreamPlayer.play()
 					print("PLAYER")
 					yield()
-					#yield(get_tree().create_timer(1), 'timeout')
+					#yield(get_tree().create_timer(0.1), 'timeout')
 				
 				#call_deferred("_send_loading_signal",rb.size(),http.get_response_body_length())
 	
