@@ -1,15 +1,18 @@
 extends WindowDialog
 
+# We can't play audio until we streamed enough of the file. This value
+# (how many bytes needed) is experimentally derived.
+const _BYTES_NEEDED_TO_PLAY_FILE = 8192 # 8kb
 var item:Dictionary
 var thread:Thread
+var _is_playing = false
 
 func _ready():
 	thread = Thread.new()
-	$PlayButton.disabled = true
-	$PlayButton.text = "Loading ..."
 	
 	#if not thread.is_active():
-	thread.start(self, "_start_streaming")
+	#thread.start(self, "_start_streaming")
+	self._start_streaming([])
 
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
@@ -24,7 +27,7 @@ func _start_streaming(params):
 	var error = http.connect_to_host(host, -1, use_ssl)
 	
 	var ogg_stream = AudioStreamOGGVorbis.new()
-	var rb = PoolByteArray()
+	var buffer = PoolByteArray()
 	
 	############################################################
 	# http://codetuto.com/2015/05/using-httpclient-in-godot/
@@ -56,18 +59,18 @@ func _start_streaming(params):
 			if(chunk.size() == 0):
 				OS.delay_usec(100)
 			else:
-				rb = rb + chunk
+				buffer.append_array(chunk)
 				
-				# Updated every chunk, meh.
-				$PlayButton.disabled = false
-				$PlayButton.text = "Play"
-				
-				# constantly re-assign
-				ogg_stream.data = rb
+				ogg_stream.data = buffer
 				$AudioStreamPlayer.stream = ogg_stream
+				
+				$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024 / 1024.0) + " mb"
+				if len(buffer) >= _BYTES_NEEDED_TO_PLAY_FILE and not _is_playing:
+					_is_playing = true
+					$AudioStreamPlayer.play()
+					print("PLAYER")
+					yield()
+					#yield(get_tree().create_timer(1), 'timeout')
+				
 				#call_deferred("_send_loading_signal",rb.size(),http.get_response_body_length())
 	
-	############################################################
-
-func _on_PlayButton_pressed():
-	$AudioStreamPlayer.play()

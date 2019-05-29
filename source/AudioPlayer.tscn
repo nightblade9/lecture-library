@@ -3,16 +3,14 @@
 [ext_resource path="res://Scripts/AudioPlayer.gd" type="Script" id=1]
 
 [node name="Popup" type="WindowDialog"]
+visible = true
 margin_right = 400.0
 margin_bottom = 250.0
 script = ExtResource( 1 )
 
-[node name="PlayButton" type="Button" parent="."]
-margin_left = 175.361
-margin_top = 116.655
-margin_right = 213.361
-margin_bottom = 136.655
-text = "Play"
-
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-[connection signal="pressed" from="PlayButton" to="." method="_on_PlayButton_pressed"]
+
+[node name="StatusLabel" type="Label" parent="."]
+margin_right = 40.0
+margin_bottom = 14.0
+text = "Loading audio ..."
