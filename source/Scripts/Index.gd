@@ -12,12 +12,19 @@ func _ready():
 func _on_download_completed(result, response_code, headers, body):
 	$Label.text = ""
 	var json = JSON.parse(body.get_string_from_utf8()).result
+	var i = 0
 	
 	for item in json:
 		var button = Button.new()
 		button.text = item.title + " (" + str(item.duration_minutes) + " minutes)"
 		button.connect("button_down", self, "_button_clicked", [item])
+		
+		button.margin_left = 16
+		button.margin_top += 16 + (i * 32)
+		button.margin_bottom += 16 + (i * 16)
+		
 		add_child(button)
+		i += 1
 
 func _button_clicked(item):
 	var player = AudioPlayer.instance()
