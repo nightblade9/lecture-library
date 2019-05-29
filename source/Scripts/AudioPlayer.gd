@@ -2,10 +2,20 @@ extends WindowDialog
 
 var item:Dictionary
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	$PlayButton.disabled = true
+	$PlayButton.text = "Loading ..."
+	# TODO: doesn't seem possible to stream, just to get the whole file
+	var request = HTTPRequest.new()
+	add_child(request)
+	request.connect("request_completed", self, "_on_audio_ready")
+	request.request(item.url)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _on_audio_ready(result, response_code, headers, body):
+	$PlayButton.disabled = false
+	$PlayButton.text = "Play"
+	
+	var ogg = AudioStreamOGGVorbis.new()
+	ogg.data = body
+	$AudioStreamPlayer.stream = ogg
+	$AudioStreamPlayer.play()
