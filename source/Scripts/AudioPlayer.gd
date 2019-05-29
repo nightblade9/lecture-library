@@ -39,20 +39,16 @@ func _seconds_to_time(seconds:float):
 		return str(hours) + ":" + str(minutes % 60) + ":" + str(int_seconds % 60)
 
 func _copy_and_start(position = 0):
-	var ogg_stream = AudioStreamOGGVorbis.new()
-	ogg_stream.data = buffer
-	 # crashes here
-	#$AudioStreamPlayer.stream = ogg_stream
+	
 	if $AudioStreamPlayer.stream == null:
+		var ogg_stream = AudioStreamOGGVorbis.new()
+		ogg_stream.data = buffer
 		$AudioStreamPlayer.stream = ogg_stream
 		
 	$AudioStreamPlayer.stream.data = buffer
-	print("@4")
 	$AudioStreamPlayer.play(position)
-	print("@5")
 
 func _on_finished():
-	print("Finished")
 	_copy_and_start($AudioStreamPlayer.get_playback_position())
 	
 func _start_streaming(params):
