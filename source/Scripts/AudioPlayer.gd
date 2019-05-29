@@ -23,8 +23,7 @@ func _ready():
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
 
 func _process(t):
-	#$StatusLabel.text = "Streamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
-	if $AudioStreamPlayer.playing and $AudioStreamPlayer.get_playback_position() > 0:
+	if $AudioStreamPlayer.playing and $AudioStreamPlayer.get_playback_position() > 1:
 		$StatusLabel.text = "Playing " + _seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + _seconds_to_time(item.duration_minutes * 60 + item.duration_seconds)
 		$StatusLabel.text += "\nStreamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
 
