@@ -23,19 +23,27 @@ func _ready():
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
 
 func _process(t):
+	return
+	
 	if $AudioStreamPlayer.playing and $AudioStreamPlayer.get_playback_position() > 1:
 		$StatusLabel.text = "Playing " + _seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + _seconds_to_time(item.duration_minutes * 60 + item.duration_seconds)
 		$StatusLabel.text += "\nStreamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
 
-func _seconds_to_time(seconds:float):
-	var int_seconds:int = seconds
-	var minutes = int_seconds / 60
-	var hours = minutes / 60
+func _seconds_to_time(total_seconds:int):
+	var seconds:int = total_seconds % 60
+	var minutes:int = total_seconds / 60	
+	var hours:int = minutes / 60
+	
+	var display_seconds = str(seconds)
+	if seconds < 10: display_seconds = "0" + str(seconds)
+	var display_minutes = str(minutes)
+	if minutes < 10: display_minutes = "0" + str(minutes)
+	
 	
 	if minutes < 60:
-		return str(minutes) + ":" + str(int_seconds % 60)
+		return str(minutes) + ":" + display_seconds
 	else:
-		return str(hours) + ":" + str(minutes % 60) + ":" + str(int_seconds % 60)
+		return str(hours) + ":" + display_minutes + ":" + display_seconds
 
 func _copy_and_start(position = 0):
 	
@@ -48,7 +56,8 @@ func _copy_and_start(position = 0):
 	$AudioStreamPlayer.play(position)
 
 func _on_finished():
-	_copy_and_start($AudioStreamPlayer.get_playback_position())
+	print("Reload")
+	#_copy_and_start($AudioStreamPlayer.get_playback_position())
 	
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
