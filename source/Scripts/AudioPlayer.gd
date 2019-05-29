@@ -57,7 +57,7 @@ func _copy_and_start(position = 0):
 
 func _on_finished():
 	print("Reload")
-	#_copy_and_start($AudioStreamPlayer.get_playback_position())
+	_copy_and_start($AudioStreamPlayer.get_playback_position())
 	
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
