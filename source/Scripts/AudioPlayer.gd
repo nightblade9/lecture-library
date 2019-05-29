@@ -51,8 +51,11 @@ func _copy_and_start(position = 0):
 		var ogg_stream = AudioStreamOGGVorbis.new()
 		ogg_stream.data = buffer
 		$AudioStreamPlayer.stream = ogg_stream
-		
-	$AudioStreamPlayer.stream.data = buffer
+	
+	# CRASH $AudioStreamPlayer.stream.data = buffer
+	$AudioStreamPlayer.stream.data.resize(0)
+	$AudioStreamPlayer.stream.data = buffer	
+	
 	$AudioStreamPlayer.play(position)
 
 func _on_finished():
