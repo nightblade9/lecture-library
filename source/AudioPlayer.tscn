@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/AudioPlayer.gd" type="Script" id=1]
+
+[node name="Popup" type="WindowDialog"]
+visible = true
+margin_right = 960.0
+margin_bottom = 540.0
+script = ExtResource( 1 )
+
+[node name="Button" type="Button" parent="."]
+margin_left = 474.863
+margin_top = 293.552
+margin_right = 512.863
+margin_bottom = 313.552
+text = "Play"

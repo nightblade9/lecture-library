@@ -1,5 +1,6 @@
 extends Node2D
 
+const AudioPlayer = preload("res://AudioPlayer.tscn")
 const _INDEX_FILE_URL = "https://raw.githubusercontent.com/nightblade9/islamic-lectures-app/master/metadata.json"
 
 func _ready():
@@ -19,4 +20,7 @@ func _on_download_completed(result, response_code, headers, body):
 		add_child(button)
 
 func _button_clicked(item):
-	pass
+	var player = AudioPlayer.instance()
+	player.item = item
+	add_child(player)
+	player.popup_centered()
