@@ -27,6 +27,7 @@ func _ready():
 	_copy_and_start()
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
 	$PositionSlider.max_value = (60 * item.duration_minutes) + item.duration_seconds
+	self.connect("popup_hide", self, "_on_close")
 
 func _process(t):
 	if $AudioStreamPlayer.playing and $AudioStreamPlayer.get_playback_position() > 1:
@@ -36,7 +37,7 @@ func _process(t):
 
 func _seconds_to_time(total_seconds:int):
 	var seconds:int = total_seconds % 60
-	var minutes:int = total_seconds / 60	
+	var minutes:int = total_seconds / 60
 	var hours:int = minutes / 60
 	
 	var display_seconds = str(seconds)
@@ -133,3 +134,19 @@ func _on_PauseResumeButton_pressed():
 		$PauseResumeButton.icon = ICONS["play"]
 	else:
 		$PauseResumeButton.icon = ICONS["pause"]
+
+func _on_PositionSlider_gui_input(event):
+	if (event is InputEventMouseButton and event.pressed) or (OS.has_feature("Android") and event is InputEventMouseMotion):
+		var click_x = event.position.x
+		var span = $PositionSlider.margin_right - $PositionSlider.margin_left
+		var click_percent = click_x / span
+		var click_time_seconds = click_percent * ((item.duration_minutes * 60) + item.duration_seconds)
+		
+		var max_seconds_loaded = $AudioStreamPlayer.stream.get_length()
+		if click_time_seconds > max_seconds_loaded:
+			click_time_seconds = max_seconds_loaded
+			
+		_copy_and_start(click_time_seconds)
+
+func _on_close():
+	$AudioStreamPlayer.stop()
