@@ -26,11 +26,13 @@ func _ready():
 		
 	_copy_and_start()
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
+	$PositionSlider.max_value = (60 * item.duration_minutes) + item.duration_seconds
 
 func _process(t):
 	if $AudioStreamPlayer.playing and $AudioStreamPlayer.get_playback_position() > 1:
 		$StatusLabel.text = "Playing " + _seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + _seconds_to_time(item.duration_minutes * 60 + item.duration_seconds)
 		$StatusLabel.text += "\nStreamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
+		$PositionSlider.value = $AudioStreamPlayer.get_playback_position()
 
 func _seconds_to_time(total_seconds:int):
 	var seconds:int = total_seconds % 60
