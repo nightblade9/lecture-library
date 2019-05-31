@@ -56,9 +56,19 @@ func _copy_and_start(position = 0):
 	
 	$AudioStreamPlayer.play(position)
 
+###
+# Not a true finish, could be that we buffered some data and ran out.
+# Then, in that case, reload and resume playback.
+# OR, could be the audio file finished.
+###
 func _on_finished():
-	print("Reload")
-	_copy_and_start($AudioStreamPlayer.get_playback_position())
+	# NB: end detection breaks if we truncate buffer. If that becomes
+	# an issue, then just keep appending to a separate size variable
+	if $AudioStreamPlayer.stream.data.size() < buffer.size():
+		_copy_and_start($AudioStreamPlayer.get_playback_position())
+	else:
+		# Audio file is done
+		$StatusLabel.text = "Done"
 	
 func _start_streaming(params):
 	var start = item.url.find("://") + 3
