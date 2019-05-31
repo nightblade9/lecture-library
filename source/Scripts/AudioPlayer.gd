@@ -3,6 +3,11 @@ extends WindowDialog
 # We can't play audio until we streamed enough of the file. This value
 # (how many bytes needed) is experimentally derived.
 const _BYTES_NEEDED_TO_PLAY_FILE = 8192 # 8kb
+const ICONS = {
+	"play": preload("res://assets/play-button.png"),
+	"stop": preload("res://assets/stop-button.png"),
+	"pause": preload("res://assets/pause-button.png"),
+}
 
 var item:Dictionary # URL, etc.
 
@@ -110,3 +115,14 @@ func _start_streaming(params):
 				OS.delay_usec(100)
 			else:
 				buffer.append_array(chunk)
+
+func _on_PlayStopButton_pressed():
+	if $AudioStreamPlayer.playing:
+		$AudioStreamPlayer.stop()
+		$PlayStopButton.icon = ICONS["play"]
+	else:
+		$AudioStreamPlayer.play()
+		$PlayStopButton.icon = ICONS["stop"]
+
+func _on_PauseResumeButton_pressed():
+	pass # Replace with function body.
