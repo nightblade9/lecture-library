@@ -17,5 +17,12 @@
         "duration_minutes": 234,
         "duration_seconds": 59
         
+    },
+    {
+        "title": "Al-Asr (test)",    
+        "url": "https://ia802609.us.archive.org/7/items/SurahAl-asr/Chapter103-SurahAl-asr.ogg",
+        "duration_minutes": 0,
+        "duration_seconds": 43
+        
     }
 ]
