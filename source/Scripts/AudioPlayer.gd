@@ -120,9 +120,14 @@ func _on_PlayStopButton_pressed():
 	if $AudioStreamPlayer.playing:
 		$AudioStreamPlayer.stop()
 		$PlayStopButton.icon = ICONS["play"]
+		$PauseResumeButton.icon = ICONS["pause"]
 	else:
 		$AudioStreamPlayer.play()
 		$PlayStopButton.icon = ICONS["stop"]
 
 func _on_PauseResumeButton_pressed():
-	pass # Replace with function body.
+	$AudioStreamPlayer.stream_paused = not $AudioStreamPlayer.stream_paused
+	if $AudioStreamPlayer.stream_paused:
+		$PauseResumeButton.icon = ICONS["play"]
+	else:
+		$PauseResumeButton.icon = ICONS["pause"]
