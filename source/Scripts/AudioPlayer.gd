@@ -1,5 +1,7 @@
 extends Panel
 
+const TimeFormat = preload("res://Scripts/TimeFormat.gd")
+
 # We can't play audio until we streamed enough of the file. This value
 # (how many bytes needed) is experimentally derived.
 const _BYTES_NEEDED_TO_PLAY_FILE = 8192 # 8kb
@@ -14,41 +16,30 @@ var item:Dictionary # URL, etc.
 var thread:Thread # BG thread that buffers data
 var buffer:PoolByteArray = PoolByteArray() # buffered data
 
-func play():
-	thread = Thread.new()
-	thread.start(self, "_start_streaming")
+var _started = false
+
+func _start():
 	
-	###
-	# Wait until we have enough data loaded that we can start. Otherwise, no audio.
-	###
-	while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
-		OS.delay_msec(100)
+	if not _started:
+		_started = true
+		thread = Thread.new()
+		thread.start(self, "_start_streaming")
 		
-	_copy_and_start()
-	$AudioStreamPlayer.connect("finished", self, "_on_finished")
-	$PositionSlider.max_value = (60 * item.duration_minutes) + item.duration_seconds
+		###
+		# Wait until we have enough data loaded that we can start. Otherwise, no audio.
+		###
+		while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
+			OS.delay_msec(100)
+			
+		_copy_and_start()
+		$AudioStreamPlayer.connect("finished", self, "_on_finished")
+		$PositionSlider.max_value = (60 * item.duration_minutes) + item.duration_seconds
 
 func _process(t):
 	if $AudioStreamPlayer.playing and $AudioStreamPlayer.get_playback_position() > 1:
-		$StatusLabel.text = "Playing " + _seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + _seconds_to_time(item.duration_minutes * 60 + item.duration_seconds)
+		$StatusLabel.text = "Playing " + TimeFormat.seconds_to_time($AudioStreamPlayer.get_playback_position()) + " / " + TimeFormat.seconds_to_time(item.duration_minutes * 60 + item.duration_seconds)
 		$StatusLabel.text += "\nStreamed: " + str(len(buffer) / 1024.0 / 1024.0) + " mb"
 		$PositionSlider.value = $AudioStreamPlayer.get_playback_position()
-
-func _seconds_to_time(total_seconds:int):
-	var seconds:int = total_seconds % 60
-	var minutes:int = total_seconds / 60
-	var hours:int = minutes / 60
-	
-	var display_seconds = str(seconds)
-	if seconds < 10: display_seconds = "0" + str(seconds)
-	var display_minutes = str(minutes)
-	if minutes < 10: display_minutes = "0" + str(minutes)
-	
-	
-	if minutes < 60:
-		return str(minutes) + ":" + display_seconds
-	else:
-		return str(hours) + ":" + display_minutes + ":" + display_seconds
 
 func _copy_and_start(position = 0):
 	
@@ -124,6 +115,7 @@ func _on_PlayStopButton_pressed():
 		$PlayStopButton.icon = ICONS["play"]
 		$PauseResumeButton.icon = ICONS["pause"]
 	else:
+		self._start()
 		$AudioStreamPlayer.play()
 		$PlayStopButton.icon = ICONS["stop"]
 
