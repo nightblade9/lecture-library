@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scripts/Index.gd" type="Script" id=1]
 [ext_resource path="res://DefaultFont.tres" type="DynamicFont" id=2]
+[ext_resource path="res://AudioPlayer.tscn" type="PackedScene" id=3]
 
 [sub_resource type="DynamicFontData" id=1]
 font_path = "res://Raleway-Black.ttf"
@@ -13,26 +14,35 @@ font_data = SubResource( 1 )
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
 
-[node name="LHS Panel" type="Panel" parent="."]
+[node name="LeftPanel" type="Panel" parent="."]
 margin_right = 350.0
 margin_bottom = 540.0
+
+[node name="ItemList" type="ItemList" parent="LeftPanel"]
+margin_right = 350.0
+margin_bottom = 540.0
+custom_fonts/font = SubResource( 2 )
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 margin_left = 350.0
 margin_right = 960.0
 margin_bottom = 540.0
 
-[node name="StatusLabel" type="Label" parent="."]
-margin_left = 380.0
-margin_top = 30.0
-margin_right = 930.0
-margin_bottom = 310.0
+[node name="StatusLabel" type="Label" parent="PanelContainer"]
+margin_left = 7.0
+margin_top = 239.0
+margin_right = 603.0
+margin_bottom = 300.0
 custom_fonts/font = ExtResource( 2 )
 text = "Loading list of audios from server ...
 "
 autowrap = true
 
-[node name="ItemList" type="ItemList" parent="."]
-margin_right = 350.0
-margin_bottom = 540.0
-custom_fonts/font = SubResource( 2 )
+[node name="AudioPlayer" parent="PanelContainer" instance=ExtResource( 3 )]
+visible = false
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 603.0
+margin_bottom = 533.0
+[connection signal="item_selected" from="LeftPanel/ItemList" to="." method="_on_ItemList_item_selected"]
+[connection signal="nothing_selected" from="LeftPanel/ItemList" to="." method="_on_ItemList_nothing_selected"]

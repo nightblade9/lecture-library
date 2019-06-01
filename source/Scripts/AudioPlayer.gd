@@ -1,4 +1,4 @@
-extends WindowDialog
+extends Panel
 
 # We can't play audio until we streamed enough of the file. This value
 # (how many bytes needed) is experimentally derived.
@@ -14,7 +14,7 @@ var item:Dictionary # URL, etc.
 var thread:Thread # BG thread that buffers data
 var buffer:PoolByteArray = PoolByteArray() # buffered data
 
-func _ready():
+func play():
 	thread = Thread.new()
 	thread.start(self, "_start_streaming")
 	
@@ -27,7 +27,6 @@ func _ready():
 	_copy_and_start()
 	$AudioStreamPlayer.connect("finished", self, "_on_finished")
 	$PositionSlider.max_value = (60 * item.duration_minutes) + item.duration_seconds
-	self.connect("popup_hide", self, "_on_close")
 
 func _process(t):
 	if $AudioStreamPlayer.playing and $AudioStreamPlayer.get_playback_position() > 1:
@@ -147,6 +146,3 @@ func _on_PositionSlider_gui_input(event):
 			click_time_seconds = max_seconds_loaded
 			
 		_copy_and_start(click_time_seconds)
-
-func _on_close():
-	$AudioStreamPlayer.stop()
