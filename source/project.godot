@@ -17,12 +17,16 @@ _global_script_class_icons={
 
 config/name="Lecture Library"
 run/main_scene="res://Index.tscn"
+boot_splash/image="res://icon.png"
+boot_splash/fullsize=false
 config/icon="res://icon.png"
 
 [display]
 
 window/size/width=960
 window/size/height=540
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
 
 [rendering]
 

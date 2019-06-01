@@ -2,23 +2,27 @@ extends Node2D
 
 const TimeFormat = preload("res://Scripts/TimeFormat.gd")
 
-const _INDEX_FILE_URL = "https://raw.githubusercontent.com/nightblade9/islamic-lectures-app/master/metadata.json"
+const _INDEX_FILE_URL = "https://raw.githubusercontent.com/nightblade9/lecture-library/master/metadata.json"
 
 var _items:Array
 
 func _ready():
+	$Panel/AudioPlayer.hide()
 	var request = HTTPRequest.new()
 	add_child(request)
 	request.connect("request_completed", self, "_on_download_completed")
 	request.request(_INDEX_FILE_URL)
 
 func _on_download_completed(result, response_code, headers, body):
-	$Panel/StatusLabel.text = ""
-	var json = JSON.parse(body.get_string_from_utf8()).result
-	_items = json
-	
-	for item in json:
-		$LeftPanel/ItemList.add_item(item.title)
+	if result != 0: # RESULT_SUCCESS
+		$Panel/StatusLabel.text = "Something went wrong when getting the list of lectures from the server.  Please try again later.\nResult: " + str(result) + ". Response Code: " + str(response_code)
+	else:
+		$Panel/StatusLabel.text = ""
+		var json = JSON.parse(body.get_string_from_utf8()).result
+		_items = json
+		
+		for item in json:
+			$LeftPanel/ItemList.add_item(item.title)
 
 func _on_ItemList_item_selected(index):
 	var item = _items[index]
