@@ -24,6 +24,7 @@ func _on_ItemList_item_selected(index):
 	var item = _items[index]
 	$Panel/AudioPlayer.item = item
 	$Panel/AudioPlayer.show()
+	$Panel/AudioPlayer.stop()
 	$Panel/StatusLabel.text = _display_for(item)
 
 func _on_ItemList_nothing_selected():

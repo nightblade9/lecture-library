@@ -16,12 +16,23 @@ var item:Dictionary # URL, etc.
 var thread:Thread # BG thread that buffers data
 var buffer:PoolByteArray = PoolByteArray() # buffered data
 
+var _terminate = false
 var _started = false
 
+func stop():
+	$AudioStreamPlayer.stop()
+	_terminate = true
+	_started = false
+	$StatusLabel.text = ""
+	$PlayStopButton.icon = ICONS["play"]
+
 func _start():
+	_terminate = false
 	
 	if not _started:
 		_started = true
+		buffer = PoolByteArray()
+		
 		thread = Thread.new()
 		thread.start(self, "_start_streaming")
 		
@@ -99,7 +110,7 @@ func _start_streaming(params):
 		http.poll()
 		OS.delay_msec(100)
 
-	if(http.has_response()):
+	if(http.has_response() and not _terminate):
 		headers = http.get_response_headers_as_dictionary()
 		while(http.get_status() == HTTPClient.STATUS_BODY):
 			http.poll()
