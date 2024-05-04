@@ -10,7 +10,7 @@ func _ready():
 	$Panel/AudioPlayer.hide()
 	var request = HTTPRequest.new()
 	add_child(request)
-	request.connect("request_completed", self, "_on_download_completed")
+	request.connect("request_completed", Callable(self, "_on_download_completed"))
 	request.request(_INDEX_FILE_URL)
 
 func _on_download_completed(result, response_code, headers, body):
@@ -18,7 +18,9 @@ func _on_download_completed(result, response_code, headers, body):
 		$Panel/StatusLabel.text = "Something went wrong when getting the list of lectures from the server.  Please try again later.\nResult: " + str(result) + ". Response Code: " + str(response_code)
 	else:
 		$Panel/StatusLabel.text = ""
-		var json = JSON.parse(body.get_string_from_utf8()).result
+		var test_json_conv = JSON.new()
+		test_json_conv.parse(body.get_string_from_utf8()).result
+		var json = test_json_conv.get_data()
 		_items = json
 		
 		for item in json:

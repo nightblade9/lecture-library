@@ -14,7 +14,7 @@ const ICONS = {
 var item:Dictionary # URL, etc.
 
 var thread:Thread # BG thread that buffers data
-var buffer:PoolByteArray = PoolByteArray() # buffered data
+var buffer:PackedByteArray = PackedByteArray() # buffered data
 
 var _terminate = false
 var _started = false
@@ -31,10 +31,10 @@ func _start():
 	
 	if not _started:
 		_started = true
-		buffer = PoolByteArray()
+		buffer = PackedByteArray()
 		
 		thread = Thread.new()
-		thread.start(self, "_start_streaming")
+		thread.start(Callable(self, "_start_streaming"))
 		
 		###
 		# Wait until we have enough data loaded that we can start. Otherwise, no audio.
@@ -43,7 +43,7 @@ func _start():
 			OS.delay_msec(100)
 			
 		_copy_and_start()
-		$AudioStreamPlayer.connect("finished", self, "_on_finished")
+		$AudioStreamPlayer.connect("finished", Callable(self, "_on_finished"))
 		$PositionSlider.max_value = (60 * item.duration_minutes) + item.duration_seconds
 
 func _process(t):
@@ -55,7 +55,7 @@ func _process(t):
 func _copy_and_start(position = 0):
 	
 	if $AudioStreamPlayer.stream == null:
-		var ogg_stream = AudioStreamOGGVorbis.new()
+		var ogg_stream = AudioStreamOggVorbis.new()
 		ogg_stream.data = buffer
 		$AudioStreamPlayer.stream = ogg_stream
 	
@@ -140,7 +140,7 @@ func _on_PauseResumeButton_pressed():
 func _on_PositionSlider_gui_input(event):
 	if (event is InputEventMouseButton and event.pressed) or (OS.has_feature("Android") and event is InputEventMouseMotion):
 		var click_x = event.position.x
-		var span = $PositionSlider.margin_right - $PositionSlider.margin_left
+		var span = $PositionSlider.offset_right - $PositionSlider.offset_left
 		var click_percent = click_x / span
 		var click_time_seconds = click_percent * ((item.duration_minutes * 60) + item.duration_seconds)
 		
