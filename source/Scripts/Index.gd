@@ -13,14 +13,17 @@ func _ready():
 	request.connect("request_completed", Callable(self, "_on_download_completed"))
 	request.request(_INDEX_FILE_URL)
 
-func _on_download_completed(result, response_code, headers, body):
+func _on_download_completed(result:int, response_code:int, headers:PackedStringArray, body:PackedByteArray):
 	if result != 0: # RESULT_SUCCESS
 		$Panel/StatusLabel.text = "Something went wrong when getting the list of lectures from the server.  Please try again later.\nResult: " + str(result) + ". Response Code: " + str(response_code)
 	else:
 		$Panel/StatusLabel.text = ""
 		var test_json_conv = JSON.new()
-		test_json_conv.parse(body.get_string_from_utf8()).result
-		var json = test_json_conv.get_data()
+		var actual_body = body.get_string_from_utf8()
+		var error = test_json_conv.parse(actual_body)
+		var json = test_json_conv.data
+		#test_json_conv.parse(body.get_string_from_utf8()).result
+		#var json = test_json_conv.get_data()
 		_items = json
 		
 		for item in json:

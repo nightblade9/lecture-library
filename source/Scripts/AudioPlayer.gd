@@ -34,16 +34,16 @@ func _start():
 		buffer = PackedByteArray()
 		
 		thread = Thread.new()
-		thread.start(Callable(self, "_start_streaming"))
+		thread.start(_start_streaming)
 		
 		###
 		# Wait until we have enough data loaded that we can start. Otherwise, no audio.
 		###
-		while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
-			OS.delay_msec(100)
+		#while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
+		#	OS.delay_msec(100)
 			
 		_copy_and_start()
-		$AudioStreamPlayer.connect("finished", Callable(self, "_on_finished"))
+		$AudioStreamPlayer.connect("finished", _on_finished)
 		$PositionSlider.max_value = (60 * item.duration_minutes) + item.duration_seconds
 
 func _process(t):
