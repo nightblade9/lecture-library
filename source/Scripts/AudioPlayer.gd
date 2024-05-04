@@ -39,8 +39,9 @@ func _start():
 		###
 		# Wait until we have enough data loaded that we can start. Otherwise, no audio.
 		###
-		#while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
-		#	OS.delay_msec(100)
+		while len(buffer) < _BYTES_NEEDED_TO_PLAY_FILE:
+			OS.delay_msec(100)
+			await get_tree().process_frame
 			
 		_copy_and_start()
 		$AudioStreamPlayer.connect("finished", _on_finished)
@@ -56,12 +57,14 @@ func _copy_and_start(position = 0):
 	
 	if $AudioStreamPlayer.stream == null:
 		var ogg_stream = AudioStreamOggVorbis.new()
-		ogg_stream.data = buffer
+		var ogg_packet = OggPacketSequence.new()
+		ogg_packet.packet_data = buffer
+		ogg_stream.packet_sequence = ogg_packet
 		$AudioStreamPlayer.stream = ogg_stream
 	
 	# CRASH $AudioStreamPlayer.stream.data = buffer
-	$AudioStreamPlayer.stream.data.resize(0)
-	$AudioStreamPlayer.stream.data = buffer	
+	#$AudioStreamPlayer.stream.packet_sequence.resize(0)
+	#$AudioStreamPlayer.stream.packet_sequence = buffer
 	
 	$AudioStreamPlayer.play(position)
 
@@ -79,17 +82,17 @@ func _on_finished():
 		# Audio file is done
 		$StatusLabel.text = "Done"
 	
-func _start_streaming(params):
+func _start_streaming():
 	var start = item.url.find("://") + 3
 	var stop = item.url.find("/", start)
 	var host = item.url.substr(start, stop - start)
 	var use_ssl = item.url.find("https://") > -1
 	
-	var url = item.url.substr(stop, len(item.url))
+	var url = item.url#.substr(stop, len(item.url))
 	
 	# Stream the file
 	var http = HTTPClient.new()
-	var error = http.connect_to_host(host, -1, use_ssl)
+	var error = http.connect_to_host(host, -1)#, use_ssl)
 		
 	############################################################
 	# http://codetuto.com/2015/05/using-httpclient-in-godot/
